@@ -751,8 +751,9 @@ CPTableViewFirstColumnOnlyAutoresizingStyle = 5;
 */
 - (void)selectRowIndexes:(CPIndexSet)rows byExtendingSelection:(BOOL)shouldExtendSelection
 {
+    var firstIndex = [rows firstIndex];
     if ([rows isEqualToIndexSet:_selectedRowIndexes] || 
-        (([rows firstIndex] != CPNotFound && [rows firstIndex] < 0) || [rows lastIndex] >= [self numberOfRows]))
+        ((firstIndex != CPNotFound && firstIndex < 0) || [rows lastIndex] >= [self numberOfRows]))
         return;
 
     // We deselect all columns when selecting rows.
@@ -773,6 +774,10 @@ CPTableViewFirstColumnOnlyAutoresizingStyle = 5;
     [self _updateHighlightWithOldRows:previousSelectedIndexes newRows:_selectedRowIndexes];
     [_tableDrawView display]; // FIXME: should be setNeedsDisplayInRect:enclosing rect of new (de)selected rows
                               // but currently -drawRect: is not implemented here
+                              
+    if (firstIndex >= 0)
+        [self scrollRowToVisible:firstIndex];
+
     [self _noteSelectionDidChange];
 }
 
@@ -3032,9 +3037,6 @@ CPTableViewFirstColumnOnlyAutoresizingStyle = 5;
     }
 
     [self selectRowIndexes:[CPIndexSet indexSetWithIndex:i] byExtendingSelection:extend];
-
-    if(i >= 0)
-        [self scrollRowToVisible:i];
 }
 
 - (void)moveUp:(id)sender
@@ -3079,9 +3081,6 @@ CPTableViewFirstColumnOnlyAutoresizingStyle = 5;
      }
     
      [self selectRowIndexes:[CPIndexSet indexSetWithIndex:i] byExtendingSelection:extend];
-    
-     if(i >= 0)
-        [self scrollRowToVisible:i];
 }
 
 - (void)deleteBackward:(id)sender
